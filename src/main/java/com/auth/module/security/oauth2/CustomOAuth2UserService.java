@@ -92,6 +92,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 .email(oAuth2UserInfo.getEmail())
                 .imageUrl(imageUrl)
                 .emailVerified(true)
+                .enabled(true)  // OAuth users are pre-verified by the provider
                 .build();
 
         return userRepository.save(user);

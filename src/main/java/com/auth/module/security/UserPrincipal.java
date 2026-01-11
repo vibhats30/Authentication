@@ -15,14 +15,18 @@ public class UserPrincipal implements OAuth2User, UserDetails {
     private Long id;
     private String email;
     private String password;
+    private boolean enabled;
+    private boolean accountNonLocked;
     private Collection<? extends GrantedAuthority> authorities;
     private Map<String, Object> attributes;
 
-    public UserPrincipal(Long id, String email, String password,
-                        Collection<? extends GrantedAuthority> authorities) {
+    public UserPrincipal(Long id, String email, String password, boolean enabled,
+                        boolean accountNonLocked, Collection<? extends GrantedAuthority> authorities) {
         this.id = id;
         this.email = email;
         this.password = password;
+        this.enabled = enabled;
+        this.accountNonLocked = accountNonLocked;
         this.authorities = authorities;
     }
 
@@ -35,6 +39,8 @@ public class UserPrincipal implements OAuth2User, UserDetails {
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
+                user.getEnabled() != null ? user.getEnabled() : true,  // Default to true if null
+                user.getAccountLocked() != null ? !user.getAccountLocked() : true,  // accountNonLocked is inverse of accountLocked
                 authorities
         );
     }
@@ -70,7 +76,7 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
     @Override
     public boolean isAccountNonLocked() {
-        return true;
+        return accountNonLocked;
     }
 
     @Override
@@ -80,7 +86,7 @@ public class UserPrincipal implements OAuth2User, UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return enabled;
     }
 
     @Override
