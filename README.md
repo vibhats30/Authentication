@@ -1,6 +1,6 @@
 # Reusable Authentication Module
 
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](https://github.com/your-username/authentication-module)
+[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/vibhats30/Authentication)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.1-brightgreen.svg)](https://spring.io/projects/spring-boot)
@@ -8,7 +8,7 @@
 
 A complete, production-ready authentication module with email/password registration and OAuth2 social login support (Google, Facebook, GitHub, Twitter). Built with Spring Boot and React.
 
-> **Version 1.0.0** - Production Ready | [Changelog](CHANGELOG.md) | [Deployment Guide](DEPLOYMENT.md)
+> **Version 1.1.0** - Enhanced Startup | [Changelog](CHANGELOG.md) | [Deployment Guide](DEPLOYMENT.md) | [Architecture](ARCHITECTURE-FLOW.md)
 
 ## Features
 
@@ -85,6 +85,24 @@ Authentication/
 ├── pom.xml                                 # Maven dependencies
 └── README.md
 ```
+
+## Quick Start
+
+### Option 1: Using Startup Scripts (Recommended)
+
+```bash
+# 1. Start backend (automatically loads .env variables)
+./start-backend.sh
+
+# 2. In a new terminal, start frontend
+./start-frontend.sh
+
+# 3. Open http://localhost:3000
+```
+
+### Option 2: Manual Start
+
+See detailed setup instructions below.
 
 ## Prerequisites
 
