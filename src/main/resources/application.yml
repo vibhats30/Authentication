@@ -17,6 +17,22 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         format_sql: true
 
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
   security:
     oauth2:
       client:
@@ -84,6 +100,16 @@ app:
 
   oauth2:
     authorized-redirect-uris: ${AUTHORIZED_REDIRECT_URIS:http://localhost:3000/oauth2/redirect,http://localhost:5173/oauth2/redirect}
+
+  mail:
+    from-email: ${MAIL_FROM_EMAIL:noreply@example.com}
+    from-name: ${MAIL_FROM_NAME:Authentication Module}
+
+  frontend:
+    url: ${FRONTEND_URL:http://localhost:3000}
+
+  verification:
+    token-expiration-hours: ${VERIFICATION_TOKEN_EXPIRATION_HOURS:24}
 
 logging:
   level:
