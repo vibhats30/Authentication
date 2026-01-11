@@ -1,0 +1,115 @@
+spring:
+  application:
+    name: authentication-module
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/authdb
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+            redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
+
+          # Facebook, GitHub, and Twitter are commented out until you configure them
+          # Uncomment and add credentials when ready
+          #facebook:
+          #  client-id: ${FACEBOOK_CLIENT_ID}
+          #  client-secret: ${FACEBOOK_CLIENT_SECRET}
+          #  scope:
+          #    - email
+          #    - public_profile
+          #  redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
+          #
+          #github:
+          #  client-id: ${GITHUB_CLIENT_ID}
+          #  client-secret: ${GITHUB_CLIENT_SECRET}
+          #  scope:
+          #    - user:email
+          #    - read:user
+          #  redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
+          #
+          #twitter:
+          #  client-id: ${TWITTER_CLIENT_ID}
+          #  client-secret: ${TWITTER_CLIENT_SECRET}
+          #  client-authentication-method: client_secret_basic
+          #  authorization-grant-type: authorization_code
+          #  redirect-uri: "{baseUrl}/oauth2/callback/{registrationId}"
+          #  scope:
+          #    - tweet.read
+          #    - users.read
+          #  client-name: Twitter
+          #
+          #provider:
+          #  twitter:
+          #    authorization-uri: https://twitter.com/i/oauth2/authorize
+          #    token-uri: https://api.twitter.com/2/oauth2/token
+          #    user-info-uri: https://api.twitter.com/2/users/me
+          #    user-name-attribute: data.id
+
+server:
+  port: 8080
+  error:
+    include-message: always
+
+app:
+  auth:
+    # JWT secret key - MUST be changed in production and stored securely
+    jwt-secret: ${JWT_SECRET:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+    # Access token expiration: 15 minutes (industry standard)
+    jwt-expiration-ms: 900000
+    # Refresh token expiration: 7 days (industry standard)
+    jwt-refresh-expiration-ms: 604800000
+
+  cors:
+    allowed-origins: ${ALLOWED_ORIGINS:http://localhost:3000,http://localhost:5173}
+
+  oauth2:
+    authorized-redirect-uris: ${AUTHORIZED_REDIRECT_URIS:http://localhost:3000/oauth2/redirect,http://localhost:5173/oauth2/redirect}
+
+logging:
+  level:
+    # Root logging level - change to INFO or WARN in production
+    root: INFO
+
+    # Application package logging - configurable per module
+    com.auth.module: ${LOG_LEVEL:INFO}
+    com.auth.module.controller: ${LOG_LEVEL_CONTROLLER:INFO}
+    com.auth.module.service: ${LOG_LEVEL_SERVICE:INFO}
+    com.auth.module.security: DEBUG
+    com.auth.module.filter: ${LOG_LEVEL_FILTER:INFO}
+
+    # Spring Security OAuth2 detailed logging
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+
+    # Hibernate logging
+    org.hibernate.SQL: ${LOG_LEVEL_SQL:DEBUG}
+    org.hibernate.type.descriptor.sql.BasicBinder: ${LOG_LEVEL_SQL_PARAMS:TRACE}
+
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} - %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+  file:
+    name: logs/authentication-module.log
+    max-size: 10MB
+    max-history: 30

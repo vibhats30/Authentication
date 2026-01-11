@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: authentication-module-test
+
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+  h2:
+    console:
+      enabled: false
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-google-client-id
+            client-secret: test-google-client-secret
+            scope:
+              - email
+              - profile
+          facebook:
+            client-id: test-facebook-client-id
+            client-secret: test-facebook-client-secret
+          github:
+            client-id: test-github-client-id
+            client-secret: test-github-client-secret
+          twitter:
+            client-id: test-twitter-client-id
+            client-secret: test-twitter-client-secret
+
+server:
+  port: 0  # Random port for testing
+
+app:
+  auth:
+    jwt-secret: dGVzdC1zZWNyZXQta2V5LWZvci1qdW5pdC10ZXN0aW5nLTI1Ni1iaXQtbWluaW11bQ==
+    jwt-expiration-ms: 60000  # 1 minute for testing
+    jwt-refresh-expiration-ms: 300000  # 5 minutes for testing
+
+  cors:
+    allowed-origins: http://localhost:3000
+
+  oauth2:
+    authorized-redirect-uris:
+      - http://localhost:3000/oauth2/redirect
+
+logging:
+  level:
+    root: WARN
+    com.auth.module: INFO
+    org.springframework.security: WARN
+    org.hibernate: WARN

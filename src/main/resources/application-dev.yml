@@ -1,0 +1,84 @@
+spring:
+  application:
+    name: authentication-module
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/authdb_dev
+    username: ${DB_USERNAME:vibhusinha}
+    password: ${DB_PASSWORD:}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${GOOGLE_CLIENT_ID}
+            client-secret: ${GOOGLE_CLIENT_SECRET}
+            scope:
+              - email
+              - profile
+
+          facebook:
+            client-id: ${FACEBOOK_CLIENT_ID:your-facebook-client-id}
+            client-secret: ${FACEBOOK_CLIENT_SECRET:your-facebook-client-secret}
+            scope:
+              - email
+              - public_profile
+
+          github:
+            client-id: ${GITHUB_CLIENT_ID:your-github-client-id}
+            client-secret: ${GITHUB_CLIENT_SECRET:your-github-client-secret}
+            scope:
+              - user:email
+              - read:user
+
+          twitter:
+            client-id: ${TWITTER_CLIENT_ID:your-twitter-client-id}
+            client-secret: ${TWITTER_CLIENT_SECRET:your-twitter-client-secret}
+            scope:
+              - tweet.read
+              - users.read
+
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+app:
+  auth:
+    tokenSecret: ${JWT_SECRET}
+    tokenExpirationMsec: ${JWT_EXPIRATION:900000}  # 15 minutes
+    refreshTokenExpirationMsec: ${JWT_REFRESH_EXPIRATION:604800000}  # 7 days
+
+  oauth2:
+    authorizedRedirectUris:
+      - http://localhost:3000/oauth2/redirect
+      - http://localhost:3000
+
+  cors:
+    allowedOrigins:
+      - http://localhost:3000
+
+logging:
+  level:
+    root: INFO
+    com.auth.module: DEBUG
+    com.auth.module.security: DEBUG
+    org.springframework.security: DEBUG
+    org.springframework.security.oauth2: DEBUG
+  file:
+    name: logs/authentication-module-dev.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
