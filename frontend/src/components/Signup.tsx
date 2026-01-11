@@ -16,6 +16,9 @@ const Signup: React.FC<SignupProps> = ({ onSuccess, onSwitchToLogin }) => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [passwordErrors, setPasswordErrors] = useState<string[]>([]);
+  const [showVerificationMessage, setShowVerificationMessage] = useState(false);
+  const [resendLoading, setResendLoading] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
 
   const { setTokens, loadUser } = useAuthStore();
 
@@ -49,6 +52,21 @@ const Signup: React.FC<SignupProps> = ({ onSuccess, onSwitchToLogin }) => {
     setPasswordErrors(validatePassword(pwd));
   };
 
+  const handleResendVerification = async () => {
+    setResendLoading(true);
+    setError('');
+
+    try {
+      await authService.resendVerificationEmail(userEmail);
+      setError('');
+      alert('Verification email sent! Please check your inbox.');
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to resend email. Please try again.');
+    } finally {
+      setResendLoading(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -67,9 +85,10 @@ const Signup: React.FC<SignupProps> = ({ onSuccess, onSwitchToLogin }) => {
 
     try {
       const tokens = await authService.signup({ name, email, password });
-      setTokens(tokens);
-      await loadUser();
-      onSuccess?.();
+      setUserEmail(email);
+      setShowVerificationMessage(true);
+      // Don't call setTokens or loadUser yet - user needs to verify email first
+      // onSuccess?.();
     } catch (err: any) {
       setError(err.response?.data?.message || 'Signup failed. Please try again.');
     } finally {
@@ -80,6 +99,58 @@ const Signup: React.FC<SignupProps> = ({ onSuccess, onSwitchToLogin }) => {
   const handleOAuth2Login = (provider: 'google' | 'facebook' | 'github' | 'twitter') => {
     window.location.href = authService.getOAuth2LoginUrl(provider);
   };
+
+  if (showVerificationMessage) {
+    return (
+      <div className="auth-container">
+        <div className="auth-card">
+          <h2 className="auth-title">Verify Your Email</h2>
+
+          <div className="verification-pending">
+            <svg
+              className="info-icon"
+              viewBox="0 0 24 24"
+              width="64"
+              height="64"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <path d="M12 16v-4M12 8h.01" />
+            </svg>
+            <p className="info-message">
+              We've sent a verification email to <strong>{userEmail}</strong>
+            </p>
+            <p className="info-subtitle">
+              Please check your inbox and click the verification link to activate your account.
+              The link will expire in 24 hours.
+            </p>
+            <p className="info-note">
+              Don't see the email? Check your spam folder.
+            </p>
+
+            <button
+              className="btn btn-secondary"
+              onClick={handleResendVerification}
+              disabled={resendLoading}
+              style={{ marginTop: '20px' }}
+            >
+              {resendLoading ? 'Sending...' : 'Resend Verification Email'}
+            </button>
+
+            {onSwitchToLogin && (
+              <p className="auth-switch" style={{ marginTop: '20px' }}>
+                <button onClick={onSwitchToLogin} className="link-button">
+                  Back to Login
+                </button>
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="auth-container">

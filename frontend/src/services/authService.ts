@@ -53,6 +53,16 @@ class AuthService {
     return response.data;
   }
 
+  async verifyEmail(token: string): Promise<string> {
+    const response = await axios.get(`${API_BASE_URL}/verify-email?token=${token}`);
+    return response.data;
+  }
+
+  async resendVerificationEmail(email: string): Promise<string> {
+    const response = await axios.post(`${API_BASE_URL}/resend-verification`, { email });
+    return response.data;
+  }
+
   getOAuth2LoginUrl(provider: 'google' | 'facebook' | 'github' | 'twitter'): string {
     // Use absolute URL to backend for OAuth2 authorization
     const backendUrl = 'http://localhost:8080';

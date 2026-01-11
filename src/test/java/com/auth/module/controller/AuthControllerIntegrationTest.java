@@ -7,6 +7,7 @@ import com.auth.module.payload.SignUpRequest;
 import com.auth.module.payload.TokenRefreshRequest;
 import com.auth.module.repository.RefreshTokenRepository;
 import com.auth.module.repository.UserRepository;
+import com.auth.module.service.EmailService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
@@ -49,6 +51,9 @@ class AuthControllerIntegrationTest {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @MockBean
+    private EmailService emailService;
 
     @BeforeEach
     void setUp() {
@@ -287,7 +292,8 @@ class AuthControllerIntegrationTest {
                 .name(name)
                 .password(passwordEncoder.encode(password))
                 .provider(AuthProvider.LOCAL)
-                .emailVerified(false)
+                .emailVerified(true)  // Set to true for test users to allow login
+                .enabled(true)  // Set to true for test users to allow login
                 .accountLocked(false)
                 .failedLoginAttempts(0)
                 .build();

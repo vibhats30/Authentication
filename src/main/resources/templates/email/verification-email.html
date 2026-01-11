@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verify Your Email</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2 4px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2563eb;
+            margin-bottom: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 30px;
+            background-color: #2563eb;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            font-size: 12px;
+            color: #666;
+        }
+        .warning {
+            background-color: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 12px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Verify Your Email Address</h1>
+
+        <p>Hello <strong th:text="${userName}">User</strong>,</p>
+
+        <p>Thank you for registering with Authentication Module! To complete your registration and activate your account, please verify your email address by clicking the button below:</p>
+
+        <a th:href="${verificationLink}" class="button">Verify Email Address</a>
+
+        <p>Or copy and paste this link into your browser:</p>
+        <p style="word-break: break-all; color: #2563eb;">
+            <a th:href="${verificationLink}" th:text="${verificationLink}">Verification Link</a>
+        </p>
+
+        <div class="warning">
+            <strong>Important:</strong> This verification link will expire in 24 hours. If you don't verify your email within this time, your account will be automatically deleted and you'll need to register again.
+        </div>
+
+        <p>If you didn't create an account with us, please ignore this email.</p>
+
+        <div class="footer">
+            <p>This is an automated email, please do not reply.</p>
+            <p>&copy; 2026 Authentication Module. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

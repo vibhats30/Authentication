@@ -3,6 +3,7 @@ import { useAuthStore } from './store/authStore';
 import AuthPage from './pages/AuthPage';
 import Dashboard from './pages/Dashboard';
 import OAuth2RedirectHandler from './components/OAuth2RedirectHandler';
+import VerifyEmail from './pages/VerifyEmail';
 
 function App() {
   const { isAuthenticated } = useAuthStore();
@@ -11,6 +12,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={<AuthPage />} />
+        <Route path="/verify-email" element={<VerifyEmail />} />
         <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
         <Route
           path="/dashboard"

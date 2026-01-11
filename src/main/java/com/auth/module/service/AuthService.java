@@ -54,6 +54,12 @@ public class AuthService {
     @Autowired
     private PasswordValidationService passwordValidationService;
 
+    @Autowired
+    private VerificationTokenService verificationTokenService;
+
+    @Autowired
+    private EmailService emailService;
+
     private static final int MAX_FAILED_ATTEMPTS = 5;
     private static final long LOCK_TIME_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
@@ -96,12 +102,31 @@ public class AuthService {
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
                 .provider(AuthProvider.LOCAL)
                 .emailVerified(false)
+                .enabled(false)  // Disable account until email is verified
                 .build();
 
         User savedUser = userRepository.save(user);
         logger.info("User account created successfully with ID: {} for email: {}",
             savedUser.getId(), savedUser.getEmail());
 
+        // Generate verification token and send email
+        logger.info("Generating verification token for user: {}", savedUser.getEmail());
+        var verificationToken = verificationTokenService.createToken(savedUser);
+
+        try {
+            emailService.sendVerificationEmail(
+                savedUser.getEmail(),
+                savedUser.getName(),
+                verificationToken.getToken()
+            );
+            logger.info("Verification email sent to: {}", savedUser.getEmail());
+        } catch (Exception e) {
+            logger.error("Failed to send verification email to: {}", savedUser.getEmail(), e);
+            // Don't fail registration if email fails - user can request resend
+        }
+
+        // Note: We still generate tokens for the response, but the user won't be able to
+        // access protected resources until they verify their email (handled by security config)
         logger.debug("Generating access and refresh tokens for userId: {}", savedUser.getId());
         String accessToken = tokenProvider.generateAccessToken(savedUser.getId(), savedUser.getEmail());
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(
@@ -110,7 +135,8 @@ public class AuthService {
                 signUpRequest.getIpAddress()
         );
 
-        logger.info("User registration completed successfully for email: {}", signUpRequest.getEmail());
+        logger.info("User registration completed successfully for email: {} - awaiting email verification",
+            signUpRequest.getEmail());
         return new AuthResponse(accessToken, refreshToken.getToken(), "Bearer");
     }
 
@@ -276,5 +302,66 @@ public class AuthService {
         } else {
             logger.warn("Logout called with null refresh token");
         }
+    }
+
+    /**
+     * Verify user's email address using verification token
+     *
+     * @param token Verification token from email
+     * @return true if verification successful
+     * @throws BadRequestException if token is invalid or expired
+     */
+    @Transactional
+    public boolean verifyEmail(String token) {
+        logger.info("Processing email verification request");
+
+        User user = verificationTokenService.verifyToken(token);
+
+        // Enable user account
+        user.setEmailVerified(true);
+        user.setEnabled(true);
+        userRepository.save(user);
+
+        logger.info("Email verified successfully for user: {}", user.getEmail());
+
+        // Send welcome email
+        try {
+            emailService.sendWelcomeEmail(user.getEmail(), user.getName());
+        } catch (Exception e) {
+            logger.error("Failed to send welcome email to: {}", user.getEmail(), e);
+            // Don't fail verification if welcome email fails
+        }
+
+        return true;
+    }
+
+    /**
+     * Resend verification email to user
+     *
+     * @param email User's email address
+     * @throws BadRequestException if user not found or already verified
+     */
+    @Transactional
+    public void resendVerificationEmail(String email) {
+        logger.info("Resending verification email to: {}", email);
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new BadRequestException("User not found with email: " + email));
+
+        if (user.getEmailVerified()) {
+            throw new BadRequestException("Email is already verified");
+        }
+
+        // Create new token (old ones will be deleted)
+        var verificationToken = verificationTokenService.createToken(user);
+
+        // Send email
+        emailService.sendVerificationEmail(
+            user.getEmail(),
+            user.getName(),
+            verificationToken.getToken()
+        );
+
+        logger.info("Verification email resent to: {}", email);
     }
 }

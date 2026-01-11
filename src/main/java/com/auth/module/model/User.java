@@ -74,6 +74,10 @@ public class User {
     @Builder.Default
     private Set<String> roles = new HashSet<>();
 
+    @Column(name = "enabled")
+    @Builder.Default
+    private Boolean enabled = true;
+
     @Column(name = "account_locked")
     @Builder.Default
     private Boolean accountLocked = false;

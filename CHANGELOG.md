@@ -5,6 +5,58 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-01-11
+
+### Added
+- **Email Verification System** - Comprehensive email verification for new user accounts
+  - Users must verify their email address after registration
+  - Verification emails sent automatically on signup
+  - 24-hour token expiration for security
+  - Accounts remain disabled until email is verified
+  - Resend verification email functionality
+
+- **Email Templates**
+  - Professional HTML email templates using Thymeleaf
+  - Verification email with clickable link and 24-hour expiration notice
+  - Welcome email sent after successful verification
+  - Account deletion warning email (12 hours before expiration)
+
+- **Automated Account Cleanup**
+  - Scheduled job runs daily at 2 AM
+  - Automatically deletes unverified accounts after 24 hours
+  - Deletes expired verification tokens
+  - Warning emails sent 12 hours before account deletion
+
+- **New API Endpoints**
+  - `GET /api/auth/verify-email?token={token}` - Verify email address
+  - `POST /api/auth/resend-verification` - Resend verification email
+
+- **Frontend Components**
+  - Email verification page with status indicators
+  - Verification pending message after signup
+  - Resend verification email button
+  - Automatic redirect to login after successful verification
+
+### Enhanced
+- **User Entity** - Added `enabled` field to track account activation status
+- **Security** - Users cannot access protected resources until email is verified
+- **Email Service** - Integrated Spring Boot Mail with SMTP support
+- **Configuration** - Added email settings to .env and application-dev.yml
+
+### Technical Details
+- VerificationToken entity with UUID tokens and expiration tracking
+- Spring @Scheduled annotations for automated cleanup tasks
+- @EnableScheduling enabled in main application class
+- Thymeleaf template engine for HTML email rendering
+- SMTP configuration with TLS support
+- Transaction management for atomic operations
+
+### Configuration
+- Configurable token expiration time (default: 24 hours)
+- SMTP server settings (host, port, username, password)
+- Email sender information (from address and name)
+- Frontend URL for verification links
+
 ## [1.1.0] - 2026-01-11
 
 ### Added
@@ -101,7 +153,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Planned Features
-- Email verification
 - Password reset functionality
 - Two-factor authentication (2FA)
 - Account activity monitoring
@@ -116,6 +167,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## Version History
 
+### [1.2.0] - 2026-01-11
+Minor enhancement release adding email verification system for improved security and user account activation.
+
 ### [1.1.0] - 2026-01-11
 Minor enhancement release with improved startup process and environment variable handling.
 
@@ -125,6 +179,26 @@ Initial production release with complete authentication system.
 ---
 
 ## Migration Guides
+
+### Upgrading to 1.2.0
+**Email Configuration Required**: You must configure SMTP settings in your `.env` file before using email verification features.
+
+Required environment variables:
+```
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-app-password
+MAIL_FROM_EMAIL=noreply@yourapp.com
+MAIL_FROM_NAME=Your App Name
+FRONTEND_URL=http://localhost:3000
+VERIFICATION_TOKEN_EXPIRATION_HOURS=24
+```
+
+**Breaking Change**: New users will now require email verification before they can access protected resources. Existing users are unaffected.
+
+**Database Migration**: New tables will be created automatically:
+- `verification_tokens` - Stores email verification tokens
 
 ### Upgrading to 1.1.0
 No breaking changes. Simply update and use the new startup scripts for easier development.

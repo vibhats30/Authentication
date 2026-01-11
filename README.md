@@ -1,19 +1,21 @@
 # Reusable Authentication Module
 
-[![Version](https://img.shields.io/badge/version-1.1.0-blue.svg)](https://github.com/vibhats30/Authentication)
+[![Version](https://img.shields.io/badge/version-1.2.0-blue.svg)](https://github.com/vibhats30/Authentication)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Java](https://img.shields.io/badge/Java-21-orange.svg)](https://openjdk.org/)
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.1-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![React](https://img.shields.io/badge/React-18-61dafb.svg)](https://reactjs.org/)
 
-A complete, production-ready authentication module with email/password registration and OAuth2 social login support (Google, Facebook, GitHub, Twitter). Built with Spring Boot and React.
+A complete, production-ready authentication module with email/password registration, email verification, and OAuth2 social login support (Google, Facebook, GitHub, Twitter). Built with Spring Boot and React.
 
-> **Version 1.1.0** - Enhanced Startup | [Changelog](CHANGELOG.md) | [Deployment Guide](DEPLOYMENT.md) | [Architecture](ARCHITECTURE-FLOW.md)
+> **Version 1.2.0** - Email Verification System | [Changelog](CHANGELOG.md) | [Deployment Guide](DEPLOYMENT.md) | [Architecture](ARCHITECTURE-FLOW.md)
 
 ## Features
 
 ### Authentication Methods
 - **Email/Password Registration** with industry-standard password requirements
+- **Email Verification** - Users must verify their email address after signup
+- **Automated Account Cleanup** - Unverified accounts deleted after 24 hours
 - **OAuth2 Social Login** - Google, Facebook, GitHub, Twitter
 - **Multi-Device Session Management** with JWT access and refresh tokens
 - **Automatic Token Refresh** on expiration
@@ -200,7 +202,29 @@ GITHUB_CLIENT_SECRET=your-github-client-secret
 
 TWITTER_CLIENT_ID=your-twitter-client-id
 TWITTER_CLIENT_SECRET=your-twitter-client-secret
+
+# Email Configuration (SMTP) - Required for email verification
+MAIL_HOST=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USERNAME=your-email@gmail.com
+MAIL_PASSWORD=your-gmail-app-password
+MAIL_FROM_EMAIL=noreply@yourapp.com
+MAIL_FROM_NAME=Authentication Module
+
+# Frontend URL for email verification links
+FRONTEND_URL=http://localhost:3000
+
+# Email verification token expiration (in hours)
+VERIFICATION_TOKEN_EXPIRATION_HOURS=24
 ```
+
+**Note about Gmail App Passwords:**
+If using Gmail, you need to enable 2-step verification and generate an app-specific password:
+1. Go to your Google Account settings
+2. Navigate to Security > 2-Step Verification
+3. At the bottom, select "App passwords"
+4. Generate a new app password for "Mail"
+5. Use this password in the `MAIL_PASSWORD` field
 
 4. Update `src/main/resources/application.yml` if needed
 

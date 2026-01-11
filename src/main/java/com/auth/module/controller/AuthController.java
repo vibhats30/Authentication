@@ -142,4 +142,47 @@ public class AuthController {
             throw e;
         }
     }
+
+    /**
+     * Verify user email address with token from email
+     *
+     * @param token Verification token from email link
+     * @return Success message
+     */
+    @GetMapping("/verify-email")
+    public ResponseEntity<?> verifyEmail(@RequestParam("token") String token) {
+        logger.info("Received email verification request");
+        logger.debug("Verification token (first 10 chars): {}...",
+            token.substring(0, Math.min(10, token.length())));
+
+        try {
+            authService.verifyEmail(token);
+            logger.info("Email verification successful");
+            return ResponseEntity.ok().body("Email verified successfully! You can now log in.");
+        } catch (Exception e) {
+            logger.error("Email verification failed - Error: {}", e.getMessage());
+            throw e;
+        }
+    }
+
+    /**
+     * Resend verification email to user
+     *
+     * @param request Contains email address
+     * @return Success message
+     */
+    @PostMapping("/resend-verification")
+    public ResponseEntity<?> resendVerification(@RequestBody java.util.Map<String, String> request) {
+        String email = request.get("email");
+        logger.info("Received resend verification request for email: {}", email);
+
+        try {
+            authService.resendVerificationEmail(email);
+            logger.info("Verification email resent successfully to: {}", email);
+            return ResponseEntity.ok().body("Verification email sent! Please check your inbox.");
+        } catch (Exception e) {
+            logger.error("Resend verification failed for email: {} - Error: {}", email, e.getMessage());
+            throw e;
+        }
+    }
 }
