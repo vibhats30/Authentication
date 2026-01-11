@@ -33,8 +33,12 @@ const Dashboard = () => {
         <h1>Welcome to Your Dashboard</h1>
 
         <div className="user-info">
-          {user.imageUrl && (
+          {user.imageUrl ? (
             <img src={user.imageUrl} alt={user.name} className="user-avatar" />
+          ) : (
+            <div className="user-avatar-placeholder">
+              {user.name.charAt(0).toUpperCase()}
+            </div>
           )}
 
           <div className="user-details">
